@@ -9,6 +9,8 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"Todo-app-golang/models"
+
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,7 +46,7 @@ func init(){
 
 	fmt.Println("Connected to MongoDB!")
 
-	collection = client.Database(dbName).Collection(colName)
+	collection = client.Database(dbName).Collection(collName)
 
 	fmt.Println("Collection instance created")
 
@@ -91,7 +93,7 @@ func UndoTask(w http.ResponseWriter,r *http.Request){
 	w.Header().Set("Access-Control-Allow-Headers","Content-Type")
 
 	params:=mux.Vars(r)
-	taskComplete(params["id"])
+	undoTask(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 
@@ -141,7 +143,7 @@ func getAlltask() []primitive.M{
 
 }
 
-func UndoTask(task String){
+func undoTask(task string){
 	fmt.Println(task)
 	id,_ :=primitive.ObjectIDFromHex(task)
 	filter:=bson.M{"_id":id}
@@ -156,7 +158,7 @@ func UndoTask(task String){
 
 func insertOneTask(task models.ToDoList){
 
-	insertResult,err:=collection.insertOne(context.Background().task)
+	insertResult,err:=collection.InsertOne(context.Background(),task)
 
 	if err!=nil{
 		log.Fatal(err)
@@ -165,9 +167,9 @@ func insertOneTask(task models.ToDoList){
 	fmt.Println("Inserted a Single Record",insertResult.InsertedID)
 }
 
-func taskComplete(task String){
+func taskComplete(task string){
 	fmt.Println(task)
-		id,_ = primitive.ObjectIDFromHex(task)
+		id,_ := primitive.ObjectIDFromHex(task)
 		filter:=bson.M{"_id": id}
 		update:=bson.M{"$set": bson.M{"status":true}}
 		result,err:=collection.UpdateOne(context.Background(),filter,update)
@@ -175,13 +177,13 @@ func taskComplete(task String){
 			log.Fatal(err)
 		}
 
-		fmt.Println("modified count: " result.ModifiedCount)
+		fmt.Println("modified count: ", result.ModifiedCount)
 }
 
-func deleteOneTask(task String) {
+func deleteOneTask(task string) {
 	fmt.Println(task)
 	id,_:=primitive.ObjectIDFromHex(task)
-	filter :=bson.M{"_id: id"}
+	filter :=bson.M{"_id:": id}
 	d,err :=collection.DeleteOne(context.Background(),filter)
 	if err !=nil{
 		log.Fatal(err)
