@@ -183,7 +183,7 @@ func taskComplete(task string){
 func deleteOneTask(task string) {
 	fmt.Println(task)
 	id,_:=primitive.ObjectIDFromHex(task)
-	filter :=bson.M{"_id:": id}
+	filter :=bson.M{"_id": id}
 	d,err :=collection.DeleteOne(context.Background(),filter)
 	if err !=nil{
 		log.Fatal(err)
