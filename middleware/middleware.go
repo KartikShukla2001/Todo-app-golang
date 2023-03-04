@@ -84,6 +84,64 @@ func TaskComplete(w http.ResponseWriter,r *http.Request){
 	json.NewEncoder(w).Encode(params["id"])
 }
 
+func UndoTask(w http.ResponseWriter,r *http.Request){
+	w.Header().Set("Context-Type","application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin","*")
+	w.Header().Set("Access-Control-Allow-Methods", "PUT")
+	w.Header().Set("Access-Control-Allow-Headers","Content-Type")
+
+	params:=mux.Vars(r)
+	taskComplete(params["id"])
+	json.NewEncoder(w).Encode(params["id"])
+}
+
+func DeleteTask(w http.ResponseWriter,r *http.Request){
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	params:=mux.Vars(r)
+	deleteOneTask(params["id"])
+	json.NewEncoder(w).Encode(params["id"])
+
+}
+
+
+func DeleteAllTask(w http.ResponseWriter,r *http.Request){
+	w.Header().Set("Context-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	count:=deleteAllTask()
+	json.NewEncoder(w).Encode(count)
+}
+
+func getAlltask() []primitive.M{
+	cur,err :=collection.Find(context.Background(),bson.D{{}})
+	if err !=nil{
+		log.Fatal(err)
+	}
+
+	var results[]primitive.M
+	for cur.Next(context.Background()){
+		var result bson.M
+		e:=cur.Decode(&result)
+		if e !=nil{
+			log.Fatal(err)
+		}
+		results=append(results,result)
+	}
+
+	if err := cur.Err(); err !=nil {
+		log.Fatal(err)
+	}
+
+	cur.Close(context.Background())
+	return results;
+
+}
+
+
 
 
 
